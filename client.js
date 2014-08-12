@@ -1,6 +1,7 @@
 var socket = new WebSocket("ws://localhost:8182", "scala-protocol");  
 socket.onopen = function (event) {
   document.getElementById("send").disabled = false;
+  document.getElementById("close").disabled = false;
 };
 socket.onmessage = function(event) {
   document.getElementById("response").value = event.data;
