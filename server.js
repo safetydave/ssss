@@ -37,16 +37,14 @@ wsServer.on('request', function(request) {
       return;
     }
 
-    var connection = request.accept('echo-protocol', request.origin);
+    var connection = request.accept('scala-protocol', request.origin);
     console.log((new Date()) + ' Connection accepted.');
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
             console.log('Received Message: ' + message.utf8Data);
-            connection.sendUTF(message.utf8Data);
-        }
-        else if (message.type === 'binary') {
-            console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-            connection.sendBytes(message.binaryData);
+            var msgdata = JSON.parse(message.utf8Data);
+            connection.sendUTF("O HAI, thanks for the '" + msgdata.type
+                + "' saying '" + msgdata.content + "'");
         }
     });
     connection.on('close', function(reasonCode, description) {
