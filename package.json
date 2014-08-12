@@ -1,0 +1,9 @@
+{
+  "name": "ssss",
+  "description": "Simple Static Scala Service",
+  "author": "David Colls <dcolls@thoughtworks.com>",
+  "dependencies": {
+    "websocket": "1.0.x"
+  },
+  "engine": "node 0.10.x"
+}
