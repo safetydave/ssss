@@ -10,8 +10,11 @@ socket.onmessage = function(event) {
 function sendMessage() {
   var content = document.getElementById("message").value;
   var message = {
-    type: "message",
-    content: content
+    type: "auto-complete",
+    doc: content,
+    fullAst: null,
+    pos: null,
+    currentNode: null
   }
   socket.send(JSON.stringify(message));
 }

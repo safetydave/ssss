@@ -29,6 +29,14 @@ function originIsAllowed(origin) {
   return true;
 }
 
+var respondToBadRequest = function(connection, message) {
+  var response = {
+    type: "bad-request",
+    message: message
+  };
+  connection.sendUTF(JSON.stringify(response));
+}
+
 wsServer.on('request', function(request) {
     if (!originIsAllowed(request.origin)) {
       // Make sure we only accept requests from an allowed origin
@@ -39,13 +47,44 @@ wsServer.on('request', function(request) {
 
     var connection = request.accept('scala-protocol', request.origin);
     console.log((new Date()) + ' Connection accepted.');
+
     connection.on('message', function(message) {
-        if (message.type === 'utf8') {
-            console.log('Received Message: ' + message.utf8Data);
-            var msgdata = JSON.parse(message.utf8Data);
-            connection.sendUTF("O HAI, thanks for the '" + msgdata.type
-                + "' saying '" + msgdata.content + "'");
+        if (message.type !== 'utf8') {
+            respondToBadRequest(connection, "Message not UTF8");
+            return;
         }
+
+        console.log('Received Message: ' + message.utf8Data);
+        var msgdata;
+        try {
+            msgdata = JSON.parse(message.utf8Data);
+        }
+        catch (err) {
+            respondToBadRequest(connection, "Message not valid JSON");
+            return;
+        }
+
+        switch(msgdata.type) {
+
+            case "auto-complete":
+                var tokens = ["NO TOKEN"];
+                msgdata.doc && (tokens = msgdata.doc.split(/\s/));
+                var response = {
+                    type: "auto-complete",
+                    // static matches, plus the first token of the document
+                    // just to show we were listening
+                    matches: ["O HAI", "ITZ COMPLEAT", tokens[0]]
+                };
+                connection.sendUTF(JSON.stringify(response));
+                break;
+
+            default:
+                respondToBadRequest(connection,
+                    "Message type '" + msgdata.type + "' not recognised");
+                break;
+
+        }
+
     });
     connection.on('close', function(reasonCode, description) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
