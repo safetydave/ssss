@@ -73,7 +73,7 @@ wsServer.on('request', function(request) {
                     type: "auto-complete",
                     // static matches, plus the first token of the document
                     // just to show we were listening
-                    matches: ["O HAI", "ITZ COMPLEAT", tokens[0]]
+                    matches: ["O HAI", "SCALAZ COMPLEAT", tokens[0]]
                 };
                 connection.sendUTF(JSON.stringify(response));
                 break;
